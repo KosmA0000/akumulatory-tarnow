@@ -1,3 +1,5 @@
+import { compactLayout } from './layout-mode.js?v=20f5ae3bca';
+
 const one = (s, root = document) => root.querySelector(s);
 const many = (s, root = document) => [...root.querySelectorAll(s)];
 const escapeHTML = value => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -150,7 +152,7 @@ async function initializeCatalog() {
   });
   many('[data-close-filters]',dialog).forEach(button => button.addEventListener('click', () => dialog.close()));
   dialog.addEventListener('close', () => { sidebar.append(form);one('[data-open-filters]').focus({preventScroll:true}); });
-  matchMedia('(min-width:768px)').addEventListener('change', event => { if (event.matches && dialog.open) dialog.close(); });
+  compactLayout.addEventListener('change', event => { if (!event.matches && dialog.open) dialog.close(); });
 }
 
 const reveal = new IntersectionObserver(entries => {

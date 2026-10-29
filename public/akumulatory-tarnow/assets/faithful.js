@@ -1,5 +1,6 @@
-import { setupStoryMotion } from './story-motion.js?v=0983cb0b8b';
+import { setupStoryMotion } from './story-motion.js?v=015a02b2e2';
 import { scenePixelRatio } from './scene-budget.js?v=2e0c4058b0';
+import { compactLayout } from './layout-mode.js?v=20f5ae3bca';
 
 let THREE, sceneModules;
 function loadSceneModules() {
@@ -250,7 +251,7 @@ class BrandHelix extends LocalScene {
       const uniforms = {
         uTexture: { value: placeholder }, uRatio: { value: new THREE.Vector2(1, 1) },
         uScrollSpeed: { value: 0 }, uColorStrength: { value: 0 },
-        uBendStrength: { value: innerWidth < 992 ? .02 : .1 },
+        uBendStrength: { value: compactLayout.matches ? .02 : .1 },
         uBackground: { value: new THREE.Color('#111510') },
         uZoom: { value: 1 }, uRevealProgress: { value: 0 }, uViewportHeight: { value: stage.clientHeight * this.renderer.getPixelRatio() }
       };
@@ -288,7 +289,7 @@ class BrandHelix extends LocalScene {
       this.camera.updateProjectionMatrix();
       this.planes.forEach(p => {
         p.material.uniforms.uViewportHeight.value = h * this.renderer.getPixelRatio();
-        p.material.uniforms.uBendStrength.value = w < 992 ? .02 : .1;
+        p.material.uniforms.uBendStrength.value = compactLayout.matches ? .02 : .1;
       });
     };
     this.resize();
@@ -667,7 +668,7 @@ async function startScenes() {
   for (const factory of sceneFactories) {
     const { stage, Scene } = factory;
     if (factory.failed) continue;
-    if (Scene === ReviewRing && innerWidth < 992) continue;
+    if (Scene === ReviewRing && compactLayout.matches) continue;
     if ([...activeScenes].some(scene => scene.stage === stage)) continue;
     // Reserve the final layout without allocating any images or scene objects.
     // The observer starts each scene shortly before it enters the viewport.
@@ -680,7 +681,7 @@ async function startScenes() {
     if (stage.dataset.sceneActive === '0') continue;
     try {
       await loadSceneModules();
-      if (reduced || (Scene === ReviewRing && innerWidth < 992)) continue;
+      if (reduced || (Scene === ReviewRing && compactLayout.matches)) continue;
       if (![...activeScenes].some(scene => scene.stage === stage)) new Scene(stage);
     }
     catch (error) {
@@ -693,8 +694,8 @@ async function startScenes() {
   }
 }
 startScenes();
-matchMedia('(min-width:992px)').addEventListener('change', event => {
-  if (!event.matches) {
+compactLayout.addEventListener('change', event => {
+  if (event.matches) {
     [...activeScenes].filter(scene => scene instanceof ReviewRing).forEach(scene => scene.destroy());
     const reviewStage = $('.clou-stage');
     sceneStartObserver.unobserve(reviewStage);

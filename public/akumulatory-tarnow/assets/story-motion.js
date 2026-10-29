@@ -1,4 +1,5 @@
 import { playOpeningMosaic } from './opening-mosaic.js?v=929ebad855';
+import { compactLayout } from './layout-mode.js?v=20f5ae3bca';
 const $ = (selector, root = document) => root.querySelector(selector);
 const $$ = (selector, root = document) => [...root.querySelectorAll(selector)];
 const clamp = n => Math.min(1, Math.max(0, n));
@@ -95,7 +96,12 @@ export function setupStoryMotion({ preference, onFrame }) {
   const heroShade = $('.hero-shade');
   const headline = $('.hero-running-copy');
   const field = $('.energy-field');
-  const energy = new CurrentField(field, preference);
+  // A hidden mobile diagram needs no SVG geometry or particle nodes.
+  let energy;
+  const setEnergy = amount => {
+    if (!energy && amount > 0) energy = new CurrentField(field, preference);
+    energy?.setProgress(amount);
+  };
   const camera = $('.energy-camera');
   const horizontal = $('.horizontal-track');
   const horizontalCamera = $('.horizontal-camera');
@@ -138,7 +144,7 @@ export function setupStoryMotion({ preference, onFrame }) {
     $('.advice-heading'), reviewStage, reviewHeading, reviewPreview, reviewCamera];
 
   function measure() {
-    const next = innerWidth >= 992 && !preference.matches;
+    const next = !compactLayout.matches && !preference.matches;
     if (enhanced !== next) {
       moving.forEach(el => el?.removeAttribute('style'));
       enhanced = next;
@@ -189,7 +195,7 @@ export function setupStoryMotion({ preference, onFrame }) {
       heroShade.style.opacity = String(1 - shrink * .75);
       const flowing = phase(p, .19, .43) * (1 - phase(p, .78, .94));
       field.style.opacity = String(flowing * .82);
-      energy.setProgress(flowing);
+      setEnergy(flowing);
       headline.style.opacity = String(phase(p, .38, .46) * (1 - phase(p, .86, .96)));
       headline.style.transform = `translateX(${headlineX}px)`;
 
@@ -256,7 +262,7 @@ export function setupStoryMotion({ preference, onFrame }) {
     } else {
       brandStage.dataset.sceneActive = '1';
       reviewStage.dataset.sceneActive = '1';
-      energy.setProgress(0);
+      setEnergy(0);
       words.forEach(word => { word.style.color = ''; });
     }
     onFrame?.();
@@ -266,6 +272,7 @@ export function setupStoryMotion({ preference, onFrame }) {
   addEventListener('scroll', schedule, { passive: true });
   addEventListener('resize', measure, { passive: true });
   preference.addEventListener('change', measure);
+  compactLayout.addEventListener('change', measure);
   document.fonts.ready.then(measure);
   measure();
   const layoutObserver = new ResizeObserver(measure);
@@ -304,13 +311,13 @@ export function setupStoryMotion({ preference, onFrame }) {
       if (!entry.isIntersecting || enhanced || preference.matches || arrived.has(entry.target)) return;
       const index = Number(entry.target.dataset.adviceIndex);
       const animation = entry.target.animate([
-        { transform: `translate(${index % 2 ? 48 : -48}px,96px) scale(.88)`, opacity: 0 },
-        { transform: 'translate(0,-5px) scale(1.02)', opacity: 1, offset: .78 },
+        { transform: `translate(${index % 2 ? 16 : -16}px,36px) scale(.97)`, opacity: 0 },
+        { transform: 'translate(0,-2px) scale(1.005)', opacity: 1, offset: .8 },
         { transform: 'translate(0,0) scale(1)', opacity: 1 }
-      ], { duration: 1000, delay: 90 * (index % 2), easing: 'cubic-bezier(.16,1,.3,1)' });
+      ], { duration: 650, delay: 50 * (index % 2), easing: 'cubic-bezier(.16,1,.3,1)' });
       $('.advice-picture img', entry.target).animate([
-        { transform: 'scale(1.16)' }, { transform: 'scale(1)' }
-      ], { duration: 1200, delay: 90 * (index % 2), easing: 'cubic-bezier(.16,1,.3,1)' });
+        { transform: 'scale(1.06)' }, { transform: 'scale(1)' }
+      ], { duration: 750, delay: 50 * (index % 2), easing: 'cubic-bezier(.16,1,.3,1)' });
       arrived.add(entry.target);
       animation.finished.catch(() => {});
     });
