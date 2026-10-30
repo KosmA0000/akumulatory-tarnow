@@ -1,4 +1,4 @@
-import { setupStoryMotion } from './story-motion.js?v=015a02b2e2';
+import { setupStoryMotion } from './story-motion.js?v=6015d811d2';
 import { scenePixelRatio } from './scene-budget.js?v=2e0c4058b0';
 import { compactLayout } from './layout-mode.js?v=20f5ae3bca';
 
@@ -14,6 +14,24 @@ const mix = (a, b, t) => a + (b - a) * t;
 const motion = matchMedia('(prefers-reduced-motion: reduce)');
 let reduced = motion.matches;
 const activeScenes = new Set();
+
+const heroVideo = $('.hero-video');
+if (heroVideo) {
+  let inView = false;
+  heroVideo.muted = true;
+  heroVideo.defaultMuted = true;
+  const syncVideo = () => {
+    if (document.hidden || motion.matches || !inView) heroVideo.pause();
+    else heroVideo.play().catch(() => {});
+  };
+  new IntersectionObserver(([entry]) => {
+    inView = entry.isIntersecting;
+    syncVideo();
+  }).observe($('.hero'));
+  document.addEventListener('visibilitychange', syncVideo);
+  motion.addEventListener('change', syncVideo);
+  syncVideo();
+}
 
 const menu = $('.menu');
 const menuToggle = $('.menu-toggle');

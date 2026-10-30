@@ -93,6 +93,7 @@ export function setupStoryMotion({ preference, onFrame }) {
   const hero = $('.hero');
   const heroCopy = $('.hero-content');
   const heroImage = $('.hero-photo img');
+  const heroVideo = $('.hero-photo video');
   const heroShade = $('.hero-shade');
   const headline = $('.hero-running-copy');
   const field = $('.energy-field');
@@ -138,7 +139,7 @@ export function setupStoryMotion({ preference, onFrame }) {
     hero: $('.energy-intro'), horizontal: $('.horizontal-story'),
     deck: $('.deck-story'), advice: $('.advice-story'), reviews: $('.reviews-section')
   };
-  const moving = [hero, heroCopy, heroImage, heroShade, headline, field, horizontal,
+  const moving = [hero, heroCopy, heroImage, heroVideo, heroShade, headline, field, horizontal,
     horizontalCamera, deckCamera, deckTitle, deckMedia, deckCards, $('.deck-next-title'),
     ...$$('.deck-photo'), ...$$('.reason-card'), ...adviceCards, advice, adviceCamera,
     $('.advice-heading'), reviewStage, reviewHeading, reviewPreview, reviewCamera];
@@ -189,6 +190,7 @@ export function setupStoryMotion({ preference, onFrame }) {
       hero.style.transform = `translateX(${push}px)`;
       hero.style.opacity = String(1 - phase(p, .9, .96));
       heroImage.style.transform = `translateX(${-shrink * w * .04}px) scale(${mix(1, .4, shrink)})`;
+      if (heroVideo) heroVideo.style.transform = heroImage.style.transform;
       heroCopy.style.opacity = String(1 - phase(p, .05, .24));
       heroCopy.style.pointerEvents = p > .2 ? 'none' : '';
       heroCopy.style.transform = `translateY(${shrink * h * .14}px)`;
