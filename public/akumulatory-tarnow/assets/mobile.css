@@ -33,7 +33,7 @@
     margin:8px 8px 0; will-change:auto;
   }
   .hero-content { position:relative; inset:auto; width:100%; max-width:560px; }
-  .hero-photo :is(img,video) { will-change:auto; }
+  .hero-photo img { will-change:auto; }
   .hero h1 { font-size:clamp(32px,9.1vw,58px); line-height:1.08; }
   .hero-eyebrow { font-size:12px; margin-bottom:20px; }
   .hero-description { font-size:15px; line-height:1.6; }

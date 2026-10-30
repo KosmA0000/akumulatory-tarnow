@@ -1,4 +1,3 @@
-import { playOpeningMosaic } from './opening-mosaic.js?v=929ebad855';
 import { compactLayout } from './layout-mode.js?v=20f5ae3bca';
 const $ = (selector, root = document) => root.querySelector(selector);
 const $$ = (selector, root = document) => [...root.querySelectorAll(selector)];
@@ -90,11 +89,10 @@ class CurrentField {
 }
 
 export function setupStoryMotion({ preference, onFrame }) {
-  const hero = $('.hero');
-  const heroCopy = $('.hero-content');
-  const heroImage = $('.hero-photo img');
-  const heroVideo = $('.hero-photo video');
-  const heroShade = $('.hero-shade');
+  const hero = $('.film-hero');
+  const heroCopy = $('.film-stage');
+  const heroImage = $('.film-bg');
+  const heroShade = $('.film-tint');
   const headline = $('.hero-running-copy');
   const field = $('.energy-field');
   // A hidden mobile diagram needs no SVG geometry or particle nodes.
@@ -139,7 +137,7 @@ export function setupStoryMotion({ preference, onFrame }) {
     hero: $('.energy-intro'), horizontal: $('.horizontal-story'),
     deck: $('.deck-story'), advice: $('.advice-story'), reviews: $('.reviews-section')
   };
-  const moving = [hero, heroCopy, heroImage, heroVideo, heroShade, headline, field, horizontal,
+  const moving = [hero, heroCopy, heroImage, heroShade, headline, field, horizontal,
     horizontalCamera, deckCamera, deckTitle, deckMedia, deckCards, $('.deck-next-title'),
     ...$$('.deck-photo'), ...$$('.reason-card'), ...adviceCards, advice, adviceCamera,
     $('.advice-heading'), reviewStage, reviewHeading, reviewPreview, reviewCamera];
@@ -157,6 +155,11 @@ export function setupStoryMotion({ preference, onFrame }) {
       const box = el.getBoundingClientRect();
       dimensions[key] = { top: box.top + scrollY, travel: Math.max(1, box.height - innerHeight) };
     }
+    // The original intro transition begins after all video frames have played.
+    const playRange = $('.film-play-range');
+    const continuation = $('.film-continuation-range');
+    dimensions.hero.top += playRange.offsetHeight;
+    dimensions.hero.travel = Math.max(1, continuation.offsetHeight);
     schedule();
   }
   const progress = key => clamp((current - dimensions[key].top) / dimensions[key].travel);
@@ -173,7 +176,7 @@ export function setupStoryMotion({ preference, onFrame }) {
     if (enhanced) {
       const p = progress('hero');
       const shrink = smooth(phase(p, .16, .43));
-      const fullW = w - 24, fullH = h - 24;
+      const fullW = w, fullH = h;
       const endW = w * (w >= 1440 ? .24 : .31);
       const endH = w * (w >= 1440 ? .159 : .205);
       const heroWidth = mix(fullW, endW, shrink);
@@ -186,11 +189,10 @@ export function setupStoryMotion({ preference, onFrame }) {
       hero.style.setProperty('--hero-full-height', `${fullH}px`);
       hero.style.width = `${heroWidth}px`;
       hero.style.height = `${mix(fullH, endH, shrink)}px`;
-      hero.style.borderRadius = `${mix(32, w, smooth(phase(p, .05, .43)))}px`;
+      hero.style.borderRadius = `${mix(0, w, smooth(phase(p, .05, .43)))}px`;
       hero.style.transform = `translateX(${push}px)`;
       hero.style.opacity = String(1 - phase(p, .9, .96));
       heroImage.style.transform = `translateX(${-shrink * w * .04}px) scale(${mix(1, .4, shrink)})`;
-      if (heroVideo) heroVideo.style.transform = heroImage.style.transform;
       heroCopy.style.opacity = String(1 - phase(p, .05, .24));
       heroCopy.style.pointerEvents = p > .2 ? 'none' : '';
       heroCopy.style.transform = `translateY(${shrink * h * .14}px)`;
@@ -326,6 +328,5 @@ export function setupStoryMotion({ preference, onFrame }) {
   }, { threshold: .05 });
   adviceCards.forEach(card => arrivals.observe(card));
 
-  playOpeningMosaic(hero, heroImage, preference);
   return { get current() { return current; }, get target() { return target; }, refresh: measure };
 }

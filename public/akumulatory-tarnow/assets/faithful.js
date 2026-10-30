@@ -1,6 +1,7 @@
-import { setupStoryMotion } from './story-motion.js?v=6015d811d2';
+import { setupStoryMotion } from './story-motion.js?v=70c9896d41';
 import { scenePixelRatio } from './scene-budget.js?v=2e0c4058b0';
 import { compactLayout } from './layout-mode.js?v=20f5ae3bca';
+import { setupFilmScroll } from './film-scroll.js?v=6ae4989789';
 
 let THREE, sceneModules;
 function loadSceneModules() {
@@ -15,23 +16,7 @@ const motion = matchMedia('(prefers-reduced-motion: reduce)');
 let reduced = motion.matches;
 const activeScenes = new Set();
 
-const heroVideo = $('.hero-video');
-if (heroVideo) {
-  let inView = false;
-  heroVideo.muted = true;
-  heroVideo.defaultMuted = true;
-  const syncVideo = () => {
-    if (document.hidden || motion.matches || !inView) heroVideo.pause();
-    else heroVideo.play().catch(() => {});
-  };
-  new IntersectionObserver(([entry]) => {
-    inView = entry.isIntersecting;
-    syncVideo();
-  }).observe($('.hero'));
-  document.addEventListener('visibilitychange', syncVideo);
-  motion.addEventListener('change', syncVideo);
-  syncVideo();
-}
+setupFilmScroll($('.film-story'), motion);
 
 const menu = $('.menu');
 const menuToggle = $('.menu-toggle');
