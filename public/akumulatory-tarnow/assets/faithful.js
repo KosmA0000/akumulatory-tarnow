@@ -1,4 +1,5 @@
-import { setupStoryMotion } from './story-motion.js?v=fcefa19930';
+import './smooth-scroll.js?v=20261104-logo-lenis';
+import { setupStoryMotion } from './story-motion.js?v=20261104-logo-lenis';
 import { scenePixelRatio } from './scene-budget.js?v=fcefa19930';
 import { compactLayout } from './layout-mode.js?v=fcefa19930';
 import { setupFilmScroll } from './film-scroll.js?v=fcefa19930';

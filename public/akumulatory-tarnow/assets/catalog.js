@@ -1,3 +1,4 @@
+import './smooth-scroll.js?v=20261104-logo-lenis';
 import { compactLayout } from './layout-mode.js?v=fcefa19930';
 
 const one = (s, root = document) => root.querySelector(s);

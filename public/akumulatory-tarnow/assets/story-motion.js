@@ -1,3 +1,4 @@
+import { scrollToPosition } from './smooth-scroll.js?v=20261104-logo-lenis';
 import { compactLayout } from './layout-mode.js?v=fcefa19930';
 const $ = (selector, root = document) => root.querySelector(selector);
 const $$ = (selector, root = document) => [...root.querySelectorAll(selector)];
@@ -91,6 +92,8 @@ class CurrentField {
 export function setupStoryMotion({ preference, onFrame }) {
   const hero = $('.film-hero');
   const heroCopy = $('.film-stage');
+  const heroFlip = $('.film-flip');
+  const heroBack = $('.film-back');
   const heroImage = $('.film-bg');
   const heroShade = $('.film-tint');
   const headline = $('.hero-running-copy');
@@ -137,7 +140,7 @@ export function setupStoryMotion({ preference, onFrame }) {
     hero: $('.energy-intro'), horizontal: $('.horizontal-story'),
     deck: $('.deck-story'), advice: $('.advice-story'), reviews: $('.reviews-section')
   };
-  const moving = [hero, heroCopy, heroImage, heroShade, headline, field, horizontal,
+  const moving = [hero, heroFlip, heroCopy, heroImage, heroShade, headline, field, horizontal,
     horizontalCamera, deckCamera, deckTitle, deckMedia, deckCards, $('.deck-next-title'),
     ...$$('.deck-photo'), ...$$('.reason-card'), ...adviceCards, advice, adviceCamera,
     $('.advice-heading'), reviewStage, reviewHeading, reviewPreview, reviewCamera];
@@ -180,18 +183,22 @@ export function setupStoryMotion({ preference, onFrame }) {
       const endW = w * (w >= 1440 ? .24 : .31);
       const endH = w * (w >= 1440 ? .159 : .205);
       const heroWidth = mix(fullW, endW, shrink);
-      const headlineX = mix(w * 1.04, -headline.scrollWidth - w * .08, phase(p, .4, .92));
+      const headlineX = mix(w * 1.04, -headline.scrollWidth - w * .08, phase(p, .64, .98));
       const gap = w * .035;
 
 
-      const push = p < .4 ? 0 : Math.min(0, headlineX - gap - (w + heroWidth) / 2);
+      const push = p < .64 ? 0 : Math.min(0, headlineX - gap - (w + heroWidth) / 2);
       hero.style.setProperty('--hero-full-width', `${fullW}px`);
       hero.style.setProperty('--hero-full-height', `${fullH}px`);
       hero.style.width = `${heroWidth}px`;
       hero.style.height = `${mix(fullH, endH, shrink)}px`;
       hero.style.borderRadius = `${mix(0, w, smooth(phase(p, .05, .43)))}px`;
       hero.style.transform = `translateX(${push}px)`;
-      hero.style.opacity = String(1 - phase(p, .9, .96));
+      hero.style.opacity = String(1 - phase(p, .98, 1));
+      // Complete the capsule before turning it; reverse scrolling rewinds the same motion.
+      const flip = smooth(phase(p, .43, .60));
+      heroFlip.style.transform = `rotateY(${flip * 180}deg)`;
+      heroBack.setAttribute('aria-hidden', String(flip < .5));
       heroImage.style.transform = `translateX(${-shrink * w * .04}px) scale(${mix(1, .4, shrink)})`;
       heroCopy.style.opacity = String(1 - phase(p, .05, .24));
       heroCopy.style.pointerEvents = p > .2 ? 'none' : '';
@@ -200,7 +207,7 @@ export function setupStoryMotion({ preference, onFrame }) {
       const flowing = phase(p, .19, .43) * (1 - phase(p, .78, .94));
       field.style.opacity = String(flowing * .82);
       setEnergy(flowing);
-      headline.style.opacity = String(phase(p, .38, .46) * (1 - phase(p, .86, .96)));
+      headline.style.opacity = String(phase(p, .62, .68) * (1 - phase(p, .94, 1)));
       headline.style.transform = `translateX(${headlineX}px)`;
 
       const handoff = progress('horizontal');
@@ -267,6 +274,7 @@ export function setupStoryMotion({ preference, onFrame }) {
       brandStage.dataset.sceneActive = '1';
       reviewStage.dataset.sceneActive = '1';
       setEnergy(0);
+      heroBack.setAttribute('aria-hidden', 'true');
       words.forEach(word => { word.style.color = ''; });
     }
     onFrame?.();
@@ -290,19 +298,16 @@ export function setupStoryMotion({ preference, onFrame }) {
     event.preventDefault();
     const [key, p] = anchors[id];
     history.replaceState(null, '', `#${id}`);
-    window.scrollTo({ top: dimensions[key].top + dimensions[key].travel * p, behavior: 'smooth' });
+    scrollToPosition(dimensions[key].top + dimensions[key].travel * p);
   });
   function alignInitialHash() {
     const id = location.hash.slice(1);
     if (!enhanced || !anchors[id]) return;
     measure();
     const [key, p] = anchors[id];
-    const previous = document.documentElement.style.scrollBehavior;
-    document.documentElement.style.scrollBehavior = 'auto';
-    window.scrollTo(0, dimensions[key].top + dimensions[key].travel * p);
+    scrollToPosition(dimensions[key].top + dimensions[key].travel * p, { immediate: true });
     current = target = scrollY;
     schedule();
-    requestAnimationFrame(() => { document.documentElement.style.scrollBehavior = previous; });
   }
   if (document.readyState === 'complete') requestAnimationFrame(alignInitialHash);
   else addEventListener('load', alignInitialHash, { once: true });
