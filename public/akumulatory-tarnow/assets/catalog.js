@@ -1,5 +1,8 @@
+import { setupPolishTypography } from './polish-typography.js?v=20261106-typesetting';
 import './smooth-scroll.js?v=20261104-logo-lenis';
 import { compactLayout } from './layout-mode.js?v=fcefa19930';
+
+setupPolishTypography();
 
 const one = (s, root = document) => root.querySelector(s);
 const many = (s, root = document) => [...root.querySelectorAll(s)];
@@ -55,6 +58,16 @@ async function initializeCatalog() {
   const count = one('[data-result-count]');
   const pagination = one('[data-pagination]');
   const chips = one('[data-active-filters]');
+  const toolbar = one('.results-toolbar');
+  const controls = document.createElement('div');
+  controls.className = 'catalog-controls';
+  toolbar.before(controls);
+  controls.append(toolbar, chips);
+  const sortLabel = sort.closest('label');
+  const caption = document.createElement('span');
+  caption.className = 'catalog-sort-caption';
+  caption.textContent = sortLabel.firstChild.textContent;
+  sortLabel.firstChild.replaceWith(caption);
   const pageSize = 24;
   const keys = ['ah','prad','napiecie','biegun'];
   let state;

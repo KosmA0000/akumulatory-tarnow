@@ -167,3 +167,8 @@
 
 
 @media(max-width:991px), (hover:none) and (pointer:coarse){.energy-camera{background:var(--night)}.hero{margin:8px 8px 0}}
+
+.header nav a[href="/akumulatory-tarnow/oferta/"] {
+  color: #ef5a46;
+  opacity: 1;
+}

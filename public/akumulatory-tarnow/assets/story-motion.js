@@ -1,3 +1,4 @@
+import { polishWords } from './polish-typography.js?v=20261106-typesetting';
 import { scrollToPosition } from './smooth-scroll.js?v=20261104-logo-lenis';
 import { compactLayout } from './layout-mode.js?v=fcefa19930';
 const $ = (selector, root = document) => root.querySelector(selector);
@@ -92,11 +93,11 @@ class CurrentField {
 export function setupStoryMotion({ preference, onFrame }) {
   const hero = $('.film-hero');
   const heroCopy = $('.film-stage');
+  const headline = $('.hero-running-copy');
   const heroFlip = $('.film-flip');
   const heroBack = $('.film-back');
   const heroImage = $('.film-bg');
   const heroShade = $('.film-tint');
-  const headline = $('.hero-running-copy');
   const field = $('.energy-field');
 
   let energy;
@@ -107,6 +108,9 @@ export function setupStoryMotion({ preference, onFrame }) {
   const camera = $('.energy-camera');
   const horizontal = $('.horizontal-track');
   const horizontalCamera = $('.horizontal-camera');
+  const aboutPanel = $('.about-panel');
+  const aboutContent = $('.about-panel-content');
+  const brandPanel = $('.brands-panel');
   const deckCamera = $('.deck-camera');
   const deckTitle = $('.deck-title');
   const deckMedia = $('.deck-media');
@@ -120,10 +124,11 @@ export function setupStoryMotion({ preference, onFrame }) {
   const reviewPreview = $('.review-preview');
   const reviewCamera = $('.reviews-camera');
   const quote = $('[data-word-reveal]');
+  const aboutCopy = [...aboutContent.children].filter(element => element !== quote);
   const text = quote.textContent;
   quote.textContent = '';
   quote.setAttribute('aria-label', text);
-  const words = text.split(/\s+/).map(word => {
+  const words = polishWords(text).map(word => {
     const span = document.createElement('span');
     span.textContent = word;
     span.className = 'word';
@@ -136,12 +141,13 @@ export function setupStoryMotion({ preference, onFrame }) {
   let current = scrollY;
   let target = scrollY;
   let dimensions = {};
+  let aboutLayout;
   const sections = {
-    hero: $('.energy-intro'), horizontal: $('.horizontal-story'),
+    hero: $('.energy-intro'), horizontal: $('.horizontal-story'), services: $('.services-overview'),
     deck: $('.deck-story'), advice: $('.advice-story'), reviews: $('.reviews-section')
   };
   const moving = [hero, heroFlip, heroCopy, heroImage, heroShade, headline, field, horizontal,
-    horizontalCamera, deckCamera, deckTitle, deckMedia, deckCards, $('.deck-next-title'),
+    horizontalCamera, aboutPanel, aboutContent, ...aboutCopy, brandPanel, quote, deckCamera, deckTitle, deckMedia, deckCards, $('.deck-next-title'),
     ...$$('.deck-photo'), ...$$('.reason-card'), ...adviceCards, advice, adviceCamera,
     $('.advice-heading'), reviewStage, reviewHeading, reviewPreview, reviewCamera];
 
@@ -153,6 +159,37 @@ export function setupStoryMotion({ preference, onFrame }) {
       current = target = scrollY;
     }
     document.documentElement.classList.toggle('enhanced-motion', enhanced);
+    // Measure line breaks only when the viewport or fonts change. During scroll,
+    // transforms preserve these lines while their edges move into alignment.
+    quote.replaceChildren(...words.flatMap(word => [word, document.createTextNode(' ')]));
+    if (enhanced) {
+      const lines = [];
+      words.forEach(word => {
+        const top = word.offsetTop;
+        let line = lines[lines.length - 1];
+        if (!line || Math.abs(line.top - top) > 2) {
+          line = { top, words: [] };
+          lines.push(line);
+        }
+        line.words.push(word);
+      });
+      const fragment = document.createDocumentFragment();
+      lines.forEach(line => {
+        const element = document.createElement('span');
+        element.className = 'quote-line';
+        line.words.forEach(word => element.append(word, document.createTextNode(' ')));
+        fragment.append(element);
+      });
+      quote.replaceChildren(fragment);
+      const position = element => ({ element, left: element.offsetLeft });
+      aboutLayout = {
+        width: aboutContent.offsetWidth,
+        fontSize: parseFloat(getComputedStyle(quote).fontSize),
+        padding: parseFloat(getComputedStyle(aboutPanel).paddingLeft),
+        lines: $$('.quote-line', quote).map(position),
+        copy: aboutCopy.map(position),
+      };
+    }
     dimensions = {};
     for (const [key, el] of Object.entries(sections)) {
       const box = el.getBoundingClientRect();
@@ -185,8 +222,6 @@ export function setupStoryMotion({ preference, onFrame }) {
       const heroWidth = mix(fullW, endW, shrink);
       const headlineX = mix(w * 1.04, -headline.scrollWidth - w * .08, phase(p, .64, .98));
       const gap = w * .035;
-
-
       const push = p < .64 ? 0 : Math.min(0, headlineX - gap - (w + heroWidth) / 2);
       hero.style.setProperty('--hero-full-width', `${fullW}px`);
       hero.style.setProperty('--hero-full-height', `${fullH}px`);
@@ -211,8 +246,22 @@ export function setupStoryMotion({ preference, onFrame }) {
       headline.style.transform = `translateX(${headlineX}px)`;
 
       const handoff = progress('horizontal');
-      const slide = smooth(phase(handoff, .28, .72));
-      horizontal.style.transform = `translateX(${-w * slide}px)`;
+      const split = smooth(phase(handoff, .28, .72));
+      const compactQuoteSize = Math.min(52, Math.max(34, w * .032));
+      const columnWidth = w * .44 - aboutLayout.padding * 2;
+      const finalScale = Math.min(columnWidth / aboutLayout.width, compactQuoteSize / aboutLayout.fontSize);
+      const textScale = mix(1, finalScale, split);
+      aboutContent.style.transform = `translate3d(${-w * .28 * split}px,0,0) scale(${textScale})`;
+      aboutLayout.lines.forEach(({ element, left }) => {
+        element.style.transform = `translate3d(${-left * split}px,0,0)`;
+      });
+      aboutLayout.copy.forEach(({ element, left }) => {
+        element.style.transform = `translate3d(${-left * split}px,0,0) scale(${1 / textScale})`;
+      });
+      brandPanel.style.transform = `translateX(${(1 - split) * w * .6}px)`;
+      brandPanel.style.opacity = String(phase(handoff, .34, .65));
+      brandPanel.style.pointerEvents = split > .3 ? 'auto' : 'none';
+      brandPanel.inert = handoff < .34;
 
 
       const aboutEntry = approach('horizontal', .08, .12);
@@ -228,7 +277,7 @@ export function setupStoryMotion({ preference, onFrame }) {
       const deckEntry = approach('deck', .12, .32);
 
 
-      brandStage.dataset.sceneActive = slide > 0 && deckEntry < 1 ? '1' : '0';
+      brandStage.dataset.sceneActive = split > 0 && deckEntry < 1 ? '1' : '0';
       const enterDeck = smooth(deckEntry);
       const exitDeck = smooth(phase(deck, .7, .9));
       deckCamera.style.setProperty('--handoff-surface', smooth(phase(deckEntry, .1, .9)));
@@ -236,8 +285,11 @@ export function setupStoryMotion({ preference, onFrame }) {
       deckTitle.style.transform = `translateX(${(-1 + enterDeck - exitDeck) * w * .64}px)`;
       deckMedia.style.transform = `translateX(${(-1 + enterDeck - exitDeck) * w * .64}px)`;
       deckCards.style.transform = `translateX(${(1 - enterDeck + exitDeck) * w * .36}px)`;
-      $$('.reason-card').forEach((card, index) => {
-        const open = index === 0 ? 1 : smooth(phase(deck, index === 1 ? .26 : .46, index === 1 ? .43 : .63));
+      const benefitCards = $$('.reason-card');
+      const benefitStep = .48 / Math.max(1, benefitCards.length - 1);
+      benefitCards.forEach((card, index) => {
+        const start = .16 + (index - 1) * benefitStep;
+        const open = index === 0 ? 1 : smooth(phase(deck, start, start + benefitStep));
         card.style.transform = `translateY(${(1 - open) * h * 1.08}px)`;
         card.style.opacity = String(index === 0 ? 1 : clamp(open * 4));
       });
@@ -247,6 +299,7 @@ export function setupStoryMotion({ preference, onFrame }) {
         photo.style.opacity = String(index === 0 ? 1 : clamp(open * 4));
       });
       const articles = progress('advice');
+      adviceCamera.style.setProperty('--advice-surface', smooth(phase(articles, .06, .2)));
       $('.deck-next-title').style.opacity = String(phase(deck, .69, .83) * (1 - phase(articles, .08, .24)));
       $('.advice-heading').style.opacity = String(phase(articles, .14, .27) * (1 - phase(articles, .66, .8)));
       adviceCards.forEach((card, index) => {
@@ -271,6 +324,7 @@ export function setupStoryMotion({ preference, onFrame }) {
       reviewHeading.style.transform = `translateY(${(1 - incoming) * 12}vh)`;
       reviewPreview.style.opacity = String(phase(reviewEntry, .15, .75));
     } else {
+      brandPanel.inert = false;
       brandStage.dataset.sceneActive = '1';
       reviewStage.dataset.sceneActive = '1';
       setEnergy(0);
@@ -290,7 +344,7 @@ export function setupStoryMotion({ preference, onFrame }) {
   const layoutObserver = new ResizeObserver(measure);
   Object.values(sections).forEach(section => layoutObserver.observe(section));
 
-  const anchors = { 'o-nas': ['horizontal', .23], akumulatory: ['horizontal', .84], uslugi: ['deck', .23], porady: ['advice', .49], opinie: ['reviews', .5] };
+  const anchors = { 'o-nas': ['horizontal', .23], akumulatory: ['horizontal', .84], uslugi: ['services', 0], 'dlaczego-my': ['deck', .23], porady: ['advice', .49], opinie: ['reviews', .5] };
   document.addEventListener('click', event => {
     const link = event.target.closest('a[href^="#"]');
     const id = link?.getAttribute('href').slice(1);
@@ -313,25 +367,6 @@ export function setupStoryMotion({ preference, onFrame }) {
   else addEventListener('load', alignInitialHash, { once: true });
 
 
-
-  const arrived = new WeakSet();
-  const arrivals = new IntersectionObserver(entries => {
-    entries.forEach(entry => {
-      if (!entry.isIntersecting || enhanced || preference.matches || arrived.has(entry.target)) return;
-      const index = Number(entry.target.dataset.adviceIndex);
-      const animation = entry.target.animate([
-        { transform: `translate(${index % 2 ? 16 : -16}px,36px) scale(.97)`, opacity: 0 },
-        { transform: 'translate(0,-2px) scale(1.005)', opacity: 1, offset: .8 },
-        { transform: 'translate(0,0) scale(1)', opacity: 1 }
-      ], { duration: 650, delay: 50 * (index % 2), easing: 'cubic-bezier(.16,1,.3,1)' });
-      $('.advice-picture img', entry.target).animate([
-        { transform: 'scale(1.06)' }, { transform: 'scale(1)' }
-      ], { duration: 750, delay: 50 * (index % 2), easing: 'cubic-bezier(.16,1,.3,1)' });
-      arrived.add(entry.target);
-      animation.finished.catch(() => {});
-    });
-  }, { threshold: .05 });
-  adviceCards.forEach(card => arrivals.observe(card));
 
   return { get current() { return current; }, get target() { return target; }, refresh: measure };
 }

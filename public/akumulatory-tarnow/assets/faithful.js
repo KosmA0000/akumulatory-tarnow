@@ -1,5 +1,10 @@
+import { polishWords, setupPolishTypography } from './polish-typography.js?v=20261106-typesetting';
+import { setupOfferDrawings } from './offer-drawings.js?v=20261106-kreska';
+import { setupMobileSectionMotion } from './mobile-section-motion.js?v=20261106-mobile-ladder';
+import { setupMobileIntroduction } from './mobile-introduction.js?v=20261106-typesetting';
+import { setupMobileHero } from './mobile-hero.js?v=20261106-mobile-ladder';
 import './smooth-scroll.js?v=20261104-logo-lenis';
-import { setupStoryMotion } from './story-motion.js?v=20261104-logo-lenis';
+import { setupStoryMotion } from './story-motion.js?v=20261106-typesetting';
 import { scenePixelRatio } from './scene-budget.js?v=fcefa19930';
 import { compactLayout } from './layout-mode.js?v=fcefa19930';
 import { setupFilmScroll } from './film-scroll.js?v=fcefa19930';
@@ -17,6 +22,11 @@ const motion = matchMedia('(prefers-reduced-motion: reduce)');
 let reduced = motion.matches;
 const activeScenes = new Set();
 
+setupPolishTypography();
+setupOfferDrawings(motion);
+setupMobileHero($('.film-story'), motion);
+setupMobileIntroduction(motion);
+setupMobileSectionMotion(motion);
 setupFilmScroll($('.film-story'), motion);
 
 const menu = $('.menu');
@@ -289,9 +299,11 @@ class BrandHelix extends LocalScene {
     this.onResize = (w, h) => {
       this.camera.fov = w < 992 ? 40 : 35;
 
-      this.camera.position.z = w < 992 ? Math.max(8.5, 3.55 / (Math.tan(THREE.MathUtils.degToRad(20)) * (w / h))) : 8.1;
+      const fitWidth = compactLayout.matches ? 2.65 : 3.55;
+      this.camera.position.z = w < 992 ? Math.max(8.5, fitWidth / (Math.tan(THREE.MathUtils.degToRad(20)) * (w / h))) : 8.1;
       this.camera.updateProjectionMatrix();
       this.planes.forEach(p => {
+        p.scale.set(compactLayout.matches ? 1.85 : 2.05, compactLayout.matches ? 1.09 : 1.205, 1);
         p.material.uniforms.uViewportHeight.value = h * this.renderer.getPixelRatio();
         p.material.uniforms.uBendStrength.value = compactLayout.matches ? .02 : .1;
       });
@@ -400,8 +412,9 @@ class BrandHelix extends LocalScene {
       const n = ((index - this.offset) % total + total) % total;
       const b = n - Math.floor(total / 2);
       const angle = b * .85;
-      const radius = 2.35 * (1 - data.hidden / 2);
-      mesh.position.set(Math.cos(angle) * radius, b * .68 - .8 + data.hidden * 1.5, Math.sin(angle) * radius);
+      const radius = (compactLayout.matches ? 1.55 : 2.35) * (1 - data.hidden / 2);
+      const spacing = compactLayout.matches ? .85 : .68;
+      mesh.position.set(Math.cos(angle) * radius, b * spacing - .8 + data.hidden * 1.5, Math.sin(angle) * radius);
       mesh.rotation.y = -angle + Math.PI / 2;
       const u = mesh.material.uniforms;
       u.uScrollSpeed.value = this.velocity;
@@ -559,7 +572,7 @@ class ReviewRing extends LocalScene {
     ctx.font = '500 50px Arial'; ctx.fillText('Google', 72, 100);
     ctx.font = '44px Arial'; ctx.fillText('★★★★★', 1180, 100);
     ctx.font = '400 88px Arial';
-    const words = text.split(/\s+/);
+    const words = polishWords(text);
     const lines = []; let line = '';
     words.forEach(word => {
       if (ctx.measureText(line + ' ' + word).width > 1380 && line) { lines.push(line); line = word; }
@@ -567,8 +580,7 @@ class ReviewRing extends LocalScene {
     });
     if (line) lines.push(line);
     const maxLines = 5;
-    lines.slice(0, maxLines).forEach((l, i) => ctx.fillText(i === maxLines - 1 && lines.length > maxLines ? l.replace(/\s\S*$/, '') + '…' : l, 72, 245 + i * 104));
-    ctx.font = '400 28px Arial'; ctx.fillStyle = '#74796f'; ctx.fillText('Opinia z Google', 72, 798);
+    lines.slice(0, maxLines).forEach((l, i) => ctx.fillText(i === maxLines - 1 && lines.length > maxLines ? l.replace(/[ \t\r\n][^ \t\r\n]*$/, '') + '…' : l, 72, 245 + i * 104));
     const texture = new THREE.CanvasTexture(canvas);
     texture.colorSpace = THREE.SRGBColorSpace;
     texture.anisotropy = Math.min(2, this.renderer.capabilities.getMaxAnisotropy());

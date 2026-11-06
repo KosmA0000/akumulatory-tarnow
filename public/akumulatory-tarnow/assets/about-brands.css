@@ -1,0 +1,68 @@
+.enhanced-motion .horizontal-track {
+  position: relative;
+  display: block;
+  width: 100%;
+}
+
+.enhanced-motion .about-panel {
+  width: 100%;
+  padding-inline: clamp(24px, 3.3vw, 48px);
+}
+
+.enhanced-motion .about-panel-content {
+  position: relative;
+  width: min(960px, 76vw);
+  max-width: none;
+  transform-origin: center;
+  will-change: transform;
+}
+
+.enhanced-motion .quote-line {
+  display: block;
+  width: max-content;
+  margin-inline: auto;
+  white-space: nowrap;
+  transform-origin: left center;
+}
+
+.enhanced-motion .quote-line .word {
+  vertical-align: top;
+}
+
+.enhanced-motion .about-panel-content > .story-label,
+.enhanced-motion .about-panel-content > p:last-of-type,
+.enhanced-motion .about-panel-content > .text-link {
+  width: max-content;
+  max-width: 100%;
+  margin-inline: auto;
+  transform-origin: left center;
+}
+
+.enhanced-motion .about-panel-content > .text-link {
+  display: flex;
+}
+
+.enhanced-motion .brands-panel {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 56%;
+  height: 100%;
+  opacity: 0;
+  transform: translateX(60vw);
+  pointer-events: none;
+  will-change: transform, opacity;
+}
+
+.enhanced-motion .brands-panel > .offer-heading {
+  display: none;
+}
+
+.enhanced-motion .brands-panel .brand-stage {
+  height: 100%;
+  min-height: 0;
+}
+
+.enhanced-motion .brands-panel .brand-scene-fallback {
+  padding-top: 110px;
+}

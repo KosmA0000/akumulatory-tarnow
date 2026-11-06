@@ -1,0 +1,144 @@
+.services-overview {
+  position: relative;
+  z-index: 5;
+  padding: 100px 6vw 80px;
+  border-radius: 48px 48px 0 0;
+  background: #fff;
+  color: var(--ink);
+  box-shadow: 0 -14px 40px #1115100a;
+}
+.services-layout { max-width: 1120px; margin-inline: auto; }
+.services-intro { text-align: center; }
+.services-heading h2 {
+  font: 800 clamp(56px, 7.2vw, 104px)/1.04 Manrope, Arial, sans-serif;
+  letter-spacing: -.055em;
+  text-transform: uppercase;
+}
+.services-all {
+  min-height: 46px;
+  margin: 28px 0 0;
+  padding: 11px 20px;
+  border: 1px solid #c9d0c1;
+  border-radius: 100px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+}
+.services-window { min-width: 0; }
+.services-grid { display: block; margin-top: 64px; }
+.service-tile {
+  position: relative;
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  min-height: 200px;
+  padding: 44px 100px 44px 0;
+  border-bottom: 1px solid #dfe3d8;
+}
+.service-tile h3 {
+  margin-bottom: 16px;
+  font-size: clamp(24px, 2vw, 30px);
+  font-weight: 700;
+  line-height: 1.25;
+  letter-spacing: -.04em;
+  text-transform: uppercase;
+}
+.service-tile p { max-width: 940px; color: #72786b; font-size: 17px; line-height: 1.75; }
+.service-more {
+  position: absolute;
+  right: 0;
+  top: 50%;
+  display: grid;
+  place-items: center;
+  width: 54px;
+  height: 54px;
+  translate: 0 -50%;
+  border: 1px solid #c9d0c1;
+  border-radius: 50%;
+  transition: background .25s, border-color .25s, color .25s;
+}
+.service-more > span { font-size: 24px; line-height: 1; }
+.enhanced-motion .services-overview + .deck-story { margin-top: 0; }
+@media (hover: hover) {
+  .service-tile:hover .service-more { border-color: #c34530; background: #c34530; color: #fff; }
+}
+@media (max-width: 991px), (hover: none) and (pointer: coarse) {
+  .services-overview { padding: 52px 20px 0; border-radius: 0; box-shadow: none; }
+  .services-layout { max-width: 700px; }
+  .services-intro { text-align: left; }
+  .services-heading h2 { font-size: clamp(30px, 9vw, 44px); }
+  .services-grid { margin-top: 30px; }
+  .service-tile { min-height: 156px; padding: 30px 56px 30px 0; }
+  .service-tile h3 { margin-bottom: 12px; font-size: 21px; }
+  .service-tile p {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 3;
+    overflow: hidden;
+    font-size: 14px;
+    line-height: 1.7;
+  }
+  .service-more { width: 36px; height: 36px; }
+  .service-more > span { font-size: 21px; }
+}
+
+.battery-overview {
+  position: relative;
+  z-index: 5;
+  padding: 100px 6vw 72px;
+  border-radius: 48px 48px 0 0;
+  background: #fff;
+  color: var(--ink);
+  box-shadow: 0 -14px 40px #1115100a;
+}
+.battery-lead {
+  max-width: 680px;
+  margin: 20px auto 0;
+  color: #72786b;
+  font-size: 17px;
+  line-height: 1.75;
+}
+.battery-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 32px;
+  margin-top: 64px;
+}
+.battery-tile {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 54px;
+  align-items: center;
+  align-content: start;
+  gap: 20px 12px;
+  min-width: 0;
+  padding-bottom: 32px;
+  border-bottom: 1px solid #dfe3d8;
+}
+.battery-tile .offer-drawing { grid-column: 1 / -1; }
+.battery-tile h3 {
+  font-size: clamp(18px, 1.55vw, 22px);
+  font-weight: 700;
+  line-height: 1.25;
+  letter-spacing: -.04em;
+  text-transform: uppercase;
+}
+.battery-tile .service-more { position: static; translate: none; }
+@media (hover: hover) {
+  .battery-tile:hover .service-more { border-color: #c34530; background: #c34530; color: #fff; }
+}
+@media (min-width: 992px) and (hover: hover), (min-width: 992px) and (pointer: fine) {
+  .brands-panel > .offer-heading { display: none; }
+  .battery-overview + .services-overview {
+    padding-top: 72px;
+    border-radius: 0;
+    box-shadow: none;
+  }
+}
+@media (max-width: 1180px) {
+  .battery-tile { grid-template-columns: minmax(0, 1fr) 44px; column-gap: 8px; }
+  .battery-tile .service-more { width: 44px; height: 44px; }
+}
+@media (max-width: 991px), (hover: none) and (pointer: coarse) {
+  .battery-overview { display: none; }
+}
