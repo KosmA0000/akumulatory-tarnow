@@ -5,6 +5,11 @@
 }
 
 @media (max-width: 991px), (hover: none) and (pointer: coarse) {
+  .film-story.is-mobile-hero {
+    --night: #010101;
+    background: var(--night);
+  }
+
   .film-story.is-mobile-hero > .energy-camera {
     position: relative;
     display: grid;
@@ -14,7 +19,7 @@
     padding: calc(94px + env(safe-area-inset-top, 0px)) 20px
       calc(80px + env(safe-area-inset-bottom, 0px));
     overflow: visible;
-    background: #111510;
+    background: var(--night);
   }
 
   .film-story.mobile-hero-motion > .energy-camera {
@@ -116,6 +121,7 @@
     translate: none;
     object-fit: contain;
     object-position: center;
+    background: var(--night);
     transform: scale(1.16);
   }
 
@@ -124,9 +130,13 @@
     display: none;
   }
 
+  .film-story.is-mobile-hero .film-front {
+    background: var(--night);
+  }
+
   .film-story.is-mobile-hero .film-back {
     border: 1px solid #ffffff20;
-    background: #111510;
+    background: var(--night);
   }
 
   .film-story.is-mobile-hero .film-back img {
