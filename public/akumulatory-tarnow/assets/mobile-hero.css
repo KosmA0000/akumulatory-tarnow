@@ -136,7 +136,7 @@
 
   .film-story.is-mobile-hero .film-back {
     border: 1px solid #ffffff20;
-    background: var(--night);
+    background: #111510;
   }
 
   .film-story.is-mobile-hero .film-back img {

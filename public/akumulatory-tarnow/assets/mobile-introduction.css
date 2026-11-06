@@ -11,7 +11,7 @@
     min-height: min(92svh, 780px);
     padding: 78px 24px 100px;
     overflow: hidden;
-    background: #111510;
+    background: linear-gradient(180deg, #010101 0px, var(--night) clamp(180px, 30svh, 320px));
   }
 
   .about-panel > .about-panel-content {
