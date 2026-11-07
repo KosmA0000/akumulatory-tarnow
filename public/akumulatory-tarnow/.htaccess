@@ -1,6 +1,3 @@
-# Wygenerowane przez tools/seo/apply_seo.py: przekierowania 301 ze starego sklepu PrestaShop.
-# Trzymać co najmniej 12 miesięcy (Google: site moves with URL changes).
-
 ErrorDocument 404 /404.html
 Options -Indexes
 
