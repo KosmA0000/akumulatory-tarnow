@@ -1,4 +1,4 @@
-import { drawings } from './offer-drawings-art.js?v=20261106-kreska';
+import { drawings } from './offer-drawings-art.js?v=2';
 
 const clamp = value => Math.max(0, Math.min(1, value));
 const ease = value => value * value * (3 - 2 * value);

@@ -1,4 +1,4 @@
-import { compactLayout } from './layout-mode.js?v=fcefa19930';
+import { compactLayout } from './layout-mode.js?v=2';
 
 export function setupMobileSectionMotion(preference) {
   const elements = [...document.querySelectorAll([
@@ -48,7 +48,6 @@ export function setupMobileSectionMotion(preference) {
       if (isIntersecting) visible.add(target);
       else {
         visible.delete(target);
-        // Preserve the correct endpoint when a fast scroll skips the entrance.
         const passed = target.getBoundingClientRect().top < 0;
         target.style.setProperty('--mobile-step-progress', passed ? '1' : '0');
       }

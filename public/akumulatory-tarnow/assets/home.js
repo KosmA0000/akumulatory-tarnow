@@ -1,13 +1,13 @@
-import { polishWords, setupPolishTypography } from './polish-typography.js?v=20261106-typesetting';
-import { setupOfferDrawings } from './offer-drawings.js?v=20261106-kreska';
-import { setupMobileSectionMotion } from './mobile-section-motion.js?v=20261106-mobile-ladder';
-import { setupMobileIntroduction } from './mobile-introduction.js?v=20261106-typesetting';
-import { setupMobileHero } from './mobile-hero.js?v=20261106-mobile-ladder';
-import './smooth-scroll.js?v=20261104-logo-lenis';
-import { setupStoryMotion } from './story-motion.js?v=20261106-typesetting';
-import { scenePixelRatio } from './scene-budget.js?v=fcefa19930';
-import { compactLayout } from './layout-mode.js?v=fcefa19930';
-import { setupFilmScroll } from './film-scroll.js?v=fcefa19930';
+import { polishWords, setupPolishTypography } from './polish-typography.js?v=2';
+import { setupOfferDrawings } from './offer-drawings.js?v=2';
+import { setupMobileSectionMotion } from './mobile-section-motion.js?v=2';
+import { setupMobileIntroduction } from './mobile-introduction.js?v=2';
+import { setupMobileHero } from './mobile-hero.js?v=2';
+import './smooth-scroll.js?v=2';
+import { setupStoryMotion } from './story-motion.js?v=2';
+import { scenePixelRatio } from './scene-budget.js?v=2';
+import { compactLayout } from './layout-mode.js?v=2';
+import { setupFilmScroll } from './film-scroll.js?v=2';
 
 let THREE, sceneModules;
 function loadSceneModules() {

@@ -1,6 +1,6 @@
-import { setupPolishTypography } from './polish-typography.js?v=20261106-typesetting';
-import './smooth-scroll.js?v=20261104-logo-lenis';
-import { compactLayout } from './layout-mode.js?v=fcefa19930';
+import { setupPolishTypography } from './polish-typography.js?v=2';
+import './smooth-scroll.js?v=2';
+import { compactLayout } from './layout-mode.js?v=2';
 
 setupPolishTypography();
 
@@ -20,7 +20,8 @@ if (imageButton) {
   const popup = one('#product-image-dialog');
   imageButton.addEventListener('click', () => {
     const source = one('img',imageButton);
-    const large = one('[data-large-image]',popup);
+    let large = one('[data-large-image]',popup);
+    if (!large) { large = document.createElement('img'); large.setAttribute('data-large-image',''); const slot = one('[data-large-image-slot]',popup); slot ? slot.replaceWith(large) : popup.append(large); }
     large.src=source.currentSrc||source.src;large.alt=source.alt;
     popup.showModal();
   });

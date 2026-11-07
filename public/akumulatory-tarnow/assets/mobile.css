@@ -215,7 +215,7 @@
     flex: 0 0 clamp(104px, 32vw, 140px);
     width: clamp(104px, 32vw, 140px);
     height: 44px;
-    background: url('/akumulatory-tarnow/assets/media/logo-akumulatory-tarnow.png') center / contain no-repeat;
+    background: url('/akumulatory-tarnow/assets/media/logo-akumulatory-tarnow-400.webp') center / contain no-repeat;
     font-size: 0;
   }
 

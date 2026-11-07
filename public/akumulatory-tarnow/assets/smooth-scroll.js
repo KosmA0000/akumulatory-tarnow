@@ -35,7 +35,6 @@ export function scrollToPosition(top, { immediate = false } = {}) {
   }
 }
 
-// Existing story anchors run on document first and supply their precise scene offsets.
 addEventListener('click', event => {
   if (event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
   const link = event.target.closest('a[href]');

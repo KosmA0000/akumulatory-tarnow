@@ -1,6 +1,6 @@
-import { polishWords } from './polish-typography.js?v=20261106-typesetting';
-import { scrollToPosition } from './smooth-scroll.js?v=20261104-logo-lenis';
-import { compactLayout } from './layout-mode.js?v=fcefa19930';
+import { polishWords } from './polish-typography.js?v=2';
+import { scrollToPosition } from './smooth-scroll.js?v=2';
+import { compactLayout } from './layout-mode.js?v=2';
 const $ = (selector, root = document) => root.querySelector(selector);
 const $$ = (selector, root = document) => [...root.querySelectorAll(selector)];
 const clamp = n => Math.min(1, Math.max(0, n));
@@ -159,8 +159,6 @@ export function setupStoryMotion({ preference, onFrame }) {
       current = target = scrollY;
     }
     document.documentElement.classList.toggle('enhanced-motion', enhanced);
-    // Measure line breaks only when the viewport or fonts change. During scroll,
-    // transforms preserve these lines while their edges move into alignment.
     quote.replaceChildren(...words.flatMap(word => [word, document.createTextNode(' ')]));
     if (enhanced) {
       const lines = [];
@@ -230,7 +228,6 @@ export function setupStoryMotion({ preference, onFrame }) {
       hero.style.borderRadius = `${mix(0, w, smooth(phase(p, .05, .43)))}px`;
       hero.style.transform = `translateX(${push}px)`;
       hero.style.opacity = String(1 - phase(p, .98, 1));
-      // Complete the capsule before turning it; reverse scrolling rewinds the same motion.
       const flip = smooth(phase(p, .43, .60));
       heroFlip.style.transform = `rotateY(${flip * 180}deg)`;
       heroBack.setAttribute('aria-hidden', String(flip < .5));

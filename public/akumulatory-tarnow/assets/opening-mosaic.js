@@ -1,5 +1,5 @@
-import { mosaicTiming } from './mosaic-pattern.js?v=fcefa19930';
-import { scenePixelRatio } from './scene-budget.js?v=fcefa19930';
+import { mosaicTiming } from './mosaic-pattern.js?v=2';
+import { scenePixelRatio } from './scene-budget.js?v=2';
 
 
 export function playOpeningMosaic(hero, image, preference) {

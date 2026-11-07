@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://www.akumulatory-tarnow.pl/sitemap.xml

@@ -1,5 +1,5 @@
-import { polishWords } from './polish-typography.js?v=20261106-typesetting';
-import { compactLayout } from './layout-mode.js?v=fcefa19930';
+import { polishWords } from './polish-typography.js?v=2';
+import { compactLayout } from './layout-mode.js?v=2';
 
 export function setupMobileIntroduction(preference) {
   const paragraph = document.querySelector('.mobile-about-copy');
