@@ -8,13 +8,34 @@
       steps: '22221122112222112211222211221122221122112222112211222211221122221122112222112211221122221122112222112211222211221122221122112222112211222211221122221122112222112211221122221122112222112211222211221122221122112222112211222211221122221122112211222211221122221122112222112211222211221122221122112222112211222211221122221122112211222211221122221122112222112211222211221122221122112222112211222211221122112222112211222211221122221122112222112211222211221122221122112222112211222211221122112222112211222211221122221122112222112211222211221122221122112222112211222211221122112222112211222211221122221122112222112211222211221122221122112222112211221122221122112222112211222211221122221122112222112211222211221122221122112222112211221122221122112222112211222211221122221122112222112211222211221122221122112211222211221122221122112222112211222211221122221122112222112211222211221122221122112211222211221122221122112222112211222211221122221122112222112211222211221122221122112211222211221122221122112222112211222211221122221122112222112211222211221122112222112211222211221122221122112222112211222211221122221122112222112211222211221122112222112211222211221122221122112222112211222211221122221122112222112211222',
       sources: [
         { codec: 'av1', src: media + 'hero-auto-720p120-av1.mp4', type: 'video/mp4; codecs="av01.0.05M.10"', bytes: 16800198 },
-        { codec: 'hevc', src: media + 'hero-auto-720p120-hevc.mp4', type: 'video/mp4; codecs="hvc1.2.4.L93.90"', bytes: 18534462 },
+        // 8-bit on purpose: 10-bit H.265 stalls every ~200 ms when scrubbing on common Intel graphics (measured on HD 620).
+        { codec: 'hevc', src: media + 'hero-auto-720p120-hevc8.mp4', type: 'video/mp4; codecs="hvc1.1.6.L93.90"', bytes: 19802138 },
         { codec: 'h264', src: media + 'hero-auto-720p120-h264.mp4', type: 'video/mp4; codecs="avc1.64001f"', bytes: 26795250 },
+      ],
+    },
+    // Earlier versions, opened with ?film=30 (4K), ?film=48 or ?film=96.
+    '30': {
+      frames: 300, fps: 30, width: 3840, height: 2160,
+      sources: [
+        { codec: 'av1', src: media + 'hero-auto-4k30-av1.mp4', type: 'video/mp4; codecs="av01.0.12M.10"', bytes: 11197559 },
+        { codec: 'h264', src: media + 'hero-auto-4k30-h264.mp4', type: 'video/mp4; codecs="avc1.640033"', bytes: 29831024 },
+      ],
+    },
+    '96': {
+      frames: 957, fps: 96, width: 1280, height: 720,
+      sources: [
+        { codec: 'h264', src: media + 'hero-auto-720p96-h264.mp4', type: 'video/mp4; codecs="avc1.64002a"', bytes: 21495092 },
+      ],
+    },
+    '48': {
+      frames: 479, fps: 48, width: 1280, height: 720,
+      sources: [
+        { codec: 'h264', src: media + 'hero-auto-720p48-h264.mp4', type: 'video/mp4; codecs="avc1.640020"', bytes: 13472990 },
       ],
     },
   };
   const params = new URLSearchParams(location.search);
-  const key = '120';
+  const key = FILMS[params.get('film')] ? params.get('film') : '120';
   const film = FILMS[key];
   const MAX_WAIT = 90000;
   const POSTER = media + 'hero-auto-poster.webp';
@@ -89,10 +110,10 @@
   function waitFor(target, types, timeout) {
     const list = types.split(' ');
     return new Promise(resolve => {
-      const done = () => {
+      const done = event => {
         clearTimeout(timer);
         list.forEach(type => target.removeEventListener(type, done));
-        resolve();
+        resolve(event ? event.type : 'timeout');
       };
       const timer = setTimeout(done, timeout);
       list.forEach(type => target.addEventListener(type, done, { once: true }));
@@ -102,17 +123,19 @@
   async function attach(src) {
     await domReady;
     const video = heroVideo();
-    if (!video) return;
+    if (!video) return false;
     video.dataset.frameCount = String(film.frames);
     video.dataset.frameRate = String(film.fps);
     video.dataset.codec = state.source?.codec || '';
-    if (video.getAttribute('src') === src) return;
+    if (video.getAttribute('src') === src) return !video.error;
     const loaded = waitFor(video, 'loadeddata error', 15000);
     video.src = src;
     video.load();
-    await loaded;
+    const result = await loaded;
     delete video.dataset.warming;
     video.dispatchEvent(new Event('hero-warmed'));
+    // Judge by the event: the first scrub seek right after this briefly lowers readyState.
+    return result === 'loadeddata' && !video.error;
   }
 
   function reveal() {
@@ -134,17 +157,30 @@
   const reduced = matchMedia('(prefers-reduced-motion: reduce)');
   const wanted = () => !compact.matches && !reduced.matches;
   let filmReady = null;
+  async function load(source) {
+    state.source = source;
+    try {
+      const blob = await download(source);
+      if (state.url) URL.revokeObjectURL(state.url);
+      state.url = URL.createObjectURL(blob);
+      return await attach(state.url);
+    } catch (error) {
+      state.error = String(error);
+      return await attach(source.src);
+    }
+  }
+
   function loadFilm() {
     return filmReady ||= (async () => {
-      state.source = await pickSource();
-      try {
-        const blob = await download(state.source);
-        state.url = URL.createObjectURL(blob);
-        await attach(state.url);
-      } catch (error) {
-        state.error = String(error);
-        await attach(state.source.src);
-      }
+      const first = await pickSource();
+      if (await load(first)) return;
+      // The browser claimed it could play this file but it failed: fall back to H.264, which plays everywhere.
+      const fallback = film.sources.find(source => source.codec === 'h264' && source !== first);
+      if (!fallback) return;
+      state.failed = first.codec;
+      shown = 0;
+      setProgress(0);
+      await load(fallback);
     })();
   }
 
