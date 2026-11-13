@@ -7,7 +7,7 @@ import './smooth-scroll.js?v=2';
 import { setupStoryMotion } from './story-motion.js?v=2';
 import { scenePixelRatio } from './scene-budget.js?v=2';
 import { compactLayout } from './layout-mode.js?v=2';
-import { setupFilmScroll } from './film-scroll.js?v=2';
+import { setupFilmScroll } from './film-scroll.js?v=6';
 
 let THREE, sceneModules;
 function loadSceneModules() {

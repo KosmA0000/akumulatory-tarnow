@@ -7,7 +7,8 @@ let lenis;
 function syncLock() {
   if (!lenis) return;
   const locked = Boolean(document.querySelector('dialog[open]')) ||
-    root.style.overflow === 'hidden' || root.classList.contains('review-open');
+    root.style.overflow === 'hidden' || root.classList.contains('review-open') ||
+    root.classList.contains('is-loading');
   if (locked && !lenis.isStopped) lenis.stop();
   else if (!locked && lenis.isStopped) lenis.start();
 }
