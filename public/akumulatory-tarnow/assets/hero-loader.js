@@ -9,7 +9,7 @@
       sources: [
         { codec: 'av1', src: media + 'hero-auto-720p120-av1.mp4', type: 'video/mp4; codecs="av01.0.05M.10"', bytes: 16800198 },
         // 8-bit on purpose: 10-bit H.265 stalls every ~200 ms when scrubbing on common Intel graphics (measured on HD 620).
-        { codec: 'hevc', src: media + 'hero-auto-720p120-hevc8.mp4', type: 'video/mp4; codecs="hvc1.1.6.L93.90"', bytes: 19802138 },
+        { codec: 'hevc', src: media + 'hero-auto-720p120-hevc-g4.mp4', type: 'video/mp4; codecs="hvc1.1.6.L93.90"', bytes: 8247134 },
         { codec: 'h264', src: media + 'hero-auto-720p120-h264.mp4', type: 'video/mp4; codecs="avc1.64001f"', bytes: 26795250 },
       ],
     },
